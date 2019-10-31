@@ -1,0 +1,9 @@
+package khalid.com.newssearcherv4.ui
+
+object Constant{
+    var PROGRESS_DIALOG_SHOWN_STATE: String = "PROGRESS_DIALOG_SHOWN_STATE"
+    var DATA_SHOWN_STATE: String = "DATA_SHOWN_STATE"
+    var NO_DATA_SHOWN_STATE: String = "NO_DATA_SHOWN_STATE"
+    var NO_INTERNET_SHOWN_STATE: String = "NO_INTERNET_SHOWN_STATE"
+    var SERVER_ERROR_SHOWN_STATE: String = "SERVER_ERROR_SHOWN_STATE"
+}
