@@ -1,5 +1,6 @@
 package khalid.com.newssearcherv4.ui
 
+import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import androidx.appcompat.app.AppCompatActivity
@@ -15,7 +16,9 @@ import khalid.com.newssearcherv4.ui.Constant.SERVER_ERROR_SHOWN_STATE
 import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
-    private val isNetworkConnected = true
+
+    private val TAG = MainActivity::class.java.simpleName
+
     private lateinit var newsViewModel: NewsViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,76 +27,25 @@ class MainActivity : AppCompatActivity() {
         val viewModelFactory = NewsViewModelFactory()
         newsViewModel = ViewModelProviders.of(this@MainActivity, viewModelFactory).get(NewsViewModel::class.java)
 
-        getData()
+        newsViewModel.viewState.observe(this, Observer { handleState(it) })
+        newsViewModel.getLatestNews("Nigeria", "publishedAt")
+            ?.observe(this, Observer { setData(it) })
+
+        textview.setOnClickListener { startActivity(Intent(this, NextActivity::class.java)) }
     }
 
-    private fun getData() {
-
-        handleState(PROGRESS_DIALOG_SHOWN_STATE)
-        if(!isNetworkConnected){
-            handleState(NO_INTERNET_SHOWN_STATE)
-            return
-        }
-
-        newsViewModel.getLatestNews()
-        newsViewModel.newsLiveData.observe(this, Observer {latestNew ->
-            if(latestNew != null){
-                if(!latestNew.articles.isEmpty()){
-                    handleState(DATA_SHOWN_STATE)
-                    showData(latestNew)
-                }else{
-                    handleState(NO_DATA_SHOWN_STATE)
-                }
-            }else{
-                handleState(SERVER_ERROR_SHOWN_STATE)
-            }
-        })
-    }
-
-    private fun showData(latestNew: LatestNews?) {
+    private fun setData(latestNew: LatestNews?) {
         textview.text = latestNew.toString()
     }
 
-    private fun handleState(viewState: String) {
-        when (viewState){
-            PROGRESS_DIALOG_SHOWN_STATE -> {
-                showProgressDialog()
-            }
-            DATA_SHOWN_STATE -> {
-                showMainView()
-            }
-            NO_DATA_SHOWN_STATE -> {
-                showNoDataFound()
-            }
-            NO_INTERNET_SHOWN_STATE -> {
-                showNetworkDisconnected()
-            }
-            SERVER_ERROR_SHOWN_STATE -> {
-                showServerError()
-            }
-            else -> showProgressDialog()
-        }
+    private fun handleState(viewState: Status) {
+        if(viewState == Status.LOADING){ textview.text = viewState.name; Log.d(TAG,  viewState.name)}else{}
+        if(viewState == Status.SUCCESS){ Log.d(TAG,  viewState.name)}else{}
+        if(viewState == Status.EMPTY_DATA){ textview.text = viewState.name; Log.d(TAG,  viewState.name)}else{}
+        if(viewState == Status.NO_NETWORK){ textview.text = viewState.name; Log.d(TAG,  viewState.name)}else{}
+        if(viewState == Status.SERVER_ERROR){ textview.text = viewState.name; Log.d(TAG,  viewState.name)}else{}
     }
 
-    private fun showMainView() {
-
-    }
-
-    private fun showServerError() {
-
-    }
-
-    private fun showNoDataFound() {
-
-    }
-
-    private fun showNetworkDisconnected() {
-
-    }
-
-    private fun showProgressDialog() {
-
-    }
 
     override fun onDestroy() {
         super.onDestroy()

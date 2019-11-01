@@ -9,10 +9,10 @@ import khalid.com.newssearcherv4.network.models.LatestNews
  */
 class NewsRepo(private val apiInterface: NewsApiInterface) : BaseRepository() {
 
-    suspend fun getLatestNews() : LatestNews?{
+    suspend fun getLatestNews(query: String, sort: String) : LatestNews?{
 
         val latestNews = safeApiCall(
-            call = { apiInterface.fetchLatestNewsAsync("Nigeria", "publishedAt").await() },
+            call = { apiInterface.fetchLatestNewsAsync(query, sort).await() },
             error = "Error fetching news"
         )
 
